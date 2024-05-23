@@ -12,7 +12,27 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false
+      "all": false,
+      "dialog": {
+        "all": true
+      },
+      "shell": {
+        "all": true,
+        "scope": [
+          {
+            "name": "run-git-status-command",
+            "cmd": "git",
+            "args": ["-C", { "validator": "\\S+" }, "status"],
+            "sidecar": false
+          },
+          {
+            "name": "run-git-diff-command",
+            "cmd": "git",
+            "args": ["diff", { "validator": "\\S+" }],
+            "sidecar": false
+          }
+        ]
+      }
     },
     "bundle": {
       "active": true,
@@ -38,7 +58,8 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": [
+      ],
       "shortDescription": "",
       "targets": "all",
       "windows": {
