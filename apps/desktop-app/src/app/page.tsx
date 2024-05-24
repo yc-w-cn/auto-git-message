@@ -1,9 +1,10 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { HomeIcon, Settings } from "lucide-react";
+import { HomeIcon } from "lucide-react";
 import { GithubButton } from "@/components/github-button";
 import { AppStateContainer } from "@/components/app-state-container";
+import { SettingButton } from "@/components/setting-button";
 
 const Home: React.FC = () => {
   return (
@@ -30,14 +31,7 @@ const Home: React.FC = () => {
         </nav>
         <nav className="mt-auto grid gap-1 p-2">
           <GithubButton />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="mt-auto rounded-lg"
-            aria-label="Settings"
-          >
-            <Settings className="size-6" strokeWidth={2} />
-          </Button>
+          <SettingButton />
         </nav>
       </aside>
       <AppStateContainer className="flex-grow" />
