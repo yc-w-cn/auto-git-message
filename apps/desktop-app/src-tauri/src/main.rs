@@ -17,8 +17,6 @@ fn main() {
     // Loads the dotenv file
     let dotenv_path = dotenvy::dotenv().ok();
 
-    println!("{}", dotenvy::dotenv().unwrap().display());
-
     // Loads the environment variable. It doesn't matter how how it was set.
     let app_env = dotenvy::var("APP_ENV")
         .expect("APP_ENV not found")
@@ -34,21 +32,11 @@ fn main() {
         (AppEnvironment::Production, None) => (),
     }
 
-    // Print: sentry_dsn
-    println!("APP_ENV: {}", app_env);
-
     // Loads Sentry DSN from environment file.
     let sentry_dsn: String = dotenvy::var("SENTRY_DSN")
         .expect("SENTRY_DSN not found")
         .parse()
         .expect("Failed to parse SENTRY_DSN");
-
-    for (key, value) in env::vars() {
-        println!("{}: {}", key, value);
-    }
-
-    // Print: sentry_dsn
-    println!("Sentry DSN: {}", sentry_dsn);
 
     // Initialize Sentry
     let _guard = sentry::init((
