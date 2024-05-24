@@ -16,6 +16,10 @@
       "dialog": {
         "all": true
       },
+      "fs": {
+        "all": true,
+        "scope": ["**"]
+      },
       "shell": {
         "all": true,
         "scope": [
