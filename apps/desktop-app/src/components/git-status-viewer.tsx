@@ -10,14 +10,46 @@ import { FileContentChanges } from "./file-content-changes";
 import { GitStatusContentSheet } from "./git-status-content-sheet";
 import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Props {
   repositoryPath: string | undefined;
   rawData: string;
   data: GitStatus;
+  selectedFiles: Record<string, string>;
+  onSelectedFilesChange: (_: Record<string, string>) => void;
 }
 
-export function GitStatusViewer({ data, repositoryPath, rawData }: Props) {
+export function GitStatusViewer({
+  data,
+  repositoryPath,
+  rawData,
+  selectedFiles,
+  onSelectedFilesChange,
+}: Props) {
+  const addSelectedFiles = (newItem: string, newItemMode: string) => {
+    if (!(newItem in selectedFiles)) {
+      onSelectedFilesChange({ ...selectedFiles, [newItem]: newItemMode });
+    }
+  };
+
+  const removeSelectedFiles = (removeItem: string) => {
+    const newSelectedFiles = Object.keys(selectedFiles).reduce((acc, key) => {
+      if (key !== removeItem) {
+        acc[key] = selectedFiles[key];
+      }
+      return acc;
+    }, {} as Record<string, string>);
+
+    onSelectedFilesChange(newSelectedFiles);
+  };
+
+  const handleCheckedChange = (
+    checked: boolean | "indeterminate",
+    item: string,
+    mode: string
+  ) => (checked ? addSelectedFiles(item, mode) : removeSelectedFiles(item));
+
   return (
     <div
       className={cn(
@@ -46,7 +78,12 @@ export function GitStatusViewer({ data, repositoryPath, rawData }: Props) {
               </p>
               <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
                 {data.changesToBeCommitted.added.map((item, idx) => (
-                  <li key={idx}>
+                  <li key={idx} className="flex items-center space-x-1">
+                    <Checkbox
+                      onCheckedChange={(checked: boolean | "indeterminate") =>
+                        handleCheckedChange(checked, item, "added")
+                      }
+                    />
                     <FileContentChanges
                       fileName={item}
                       repositoryPath={repositoryPath}
@@ -55,7 +92,12 @@ export function GitStatusViewer({ data, repositoryPath, rawData }: Props) {
                   </li>
                 ))}
                 {data.untrackedFiles.map((item, idx) => (
-                  <li key={idx}>
+                  <li key={idx} className="flex items-center space-x-1">
+                    <Checkbox
+                      onCheckedChange={(checked: boolean | "indeterminate") =>
+                        handleCheckedChange(checked, item, "added")
+                      }
+                    />
                     <FileContentChanges
                       fileName={item}
                       repositoryPath={repositoryPath}
@@ -74,7 +116,12 @@ export function GitStatusViewer({ data, repositoryPath, rawData }: Props) {
               </p>
               <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
                 {data.changesToBeCommitted.modified.map((item, idx) => (
-                  <li key={idx}>
+                  <li key={idx} className="flex items-center space-x-1">
+                    <Checkbox
+                      onCheckedChange={(checked: boolean | "indeterminate") =>
+                        handleCheckedChange(checked, item, "modified")
+                      }
+                    />
                     <FileContentChanges
                       fileName={item}
                       repositoryPath={repositoryPath}
@@ -83,7 +130,12 @@ export function GitStatusViewer({ data, repositoryPath, rawData }: Props) {
                   </li>
                 ))}
                 {data.changesNotStagedForCommit.modified.map((item, idx) => (
-                  <li key={idx}>
+                  <li key={idx} className="flex items-center space-x-1">
+                    <Checkbox
+                      onCheckedChange={(checked: boolean | "indeterminate") =>
+                        handleCheckedChange(checked, item, "modified")
+                      }
+                    />
                     <FileContentChanges
                       fileName={item}
                       repositoryPath={repositoryPath}
@@ -102,7 +154,12 @@ export function GitStatusViewer({ data, repositoryPath, rawData }: Props) {
               </p>
               <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
                 {data.changesToBeCommitted.deleted.map((item, idx) => (
-                  <li key={idx}>
+                  <li key={idx} className="flex items-center space-x-1">
+                    <Checkbox
+                      onCheckedChange={(checked: boolean | "indeterminate") =>
+                        handleCheckedChange(checked, item, "deleted")
+                      }
+                    />
                     <FileContentChanges
                       fileName={item}
                       repositoryPath={repositoryPath}
@@ -111,30 +168,16 @@ export function GitStatusViewer({ data, repositoryPath, rawData }: Props) {
                   </li>
                 ))}
                 {data.changesNotStagedForCommit.deleted.map((item, idx) => (
-                  <li key={idx}>
+                  <li key={idx} className="flex items-center space-x-1">
+                    <Checkbox
+                      onCheckedChange={(checked: boolean | "indeterminate") =>
+                        handleCheckedChange(checked, item, "deleted")
+                      }
+                    />
                     <FileContentChanges
                       fileName={item}
                       repositoryPath={repositoryPath}
                       mode="deleted"
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          <div className="grid grid-cols-[20px_1fr] items-start gap-2">
-            <FileIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-            <div>
-              <p className="font-medium text-gray-900 dark:text-gray-50">
-                Untracked Files
-              </p>
-              <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
-                {data.untrackedFiles.map((item, idx) => (
-                  <li key={idx}>
-                    <FileContentChanges
-                      fileName={item}
-                      repositoryPath={repositoryPath}
-                      mode="added"
                     />
                   </li>
                 ))}

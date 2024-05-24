@@ -169,6 +169,7 @@ export function FileContentChanges({ repositoryPath, fileName, mode }: Props) {
               style: {
                 height: "100%",
                 overflow: "auto",
+                fontSize: 12,
               },
             }}
             customStyle={{ padding: 0, width: "100%", overflowX: "auto" }}

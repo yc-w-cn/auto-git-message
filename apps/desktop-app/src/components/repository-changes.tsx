@@ -7,10 +7,17 @@ import { GitStatusViewer } from "./git-status-viewer";
 
 interface Props {
   repositoryPath: string | undefined;
-  timestamp: number
+  timestamp: number;
+  selectedFiles: Record<string, string>;
+  onSelectedFilesChange: (_: Record<string, string>) => void;
 }
 
-export function RepositoryChanges({ repositoryPath, timestamp }: Props) {
+export function RepositoryChanges({
+  repositoryPath,
+  timestamp,
+  selectedFiles,
+  onSelectedFilesChange,
+}: Props) {
   const [statusText, setStatusText] = useState<string>("");
 
   async function checkGitStatus(directory: string): Promise<string> {
@@ -52,6 +59,8 @@ export function RepositoryChanges({ repositoryPath, timestamp }: Props) {
           data={gitStatus}
           repositoryPath={repositoryPath}
           rawData={statusText}
+          selectedFiles={selectedFiles}
+          onSelectedFilesChange={onSelectedFilesChange}
         />
       </fieldset>
     </div>

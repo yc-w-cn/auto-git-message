@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { RefreshCcwIcon } from "lucide-react";
+import { CornerDownLeft, RefreshCcwIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { RepositorySetting } from "@/components/repository-setting";
@@ -22,6 +22,17 @@ export function AppStateContainer({ className = "" }: Props) {
     "According to the given changes, suggest git message for me."
   );
   const [isSpinning, setIsSpinning] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<Record<string, string>>(
+    {}
+  );
+
+  const resetSelectedFiles = () => {
+    setSelectedFiles({});
+  };
+
+  useEffect(() => {
+    resetSelectedFiles();
+  }, [repositoryPath]);
 
   const handleRefreshClick = () => {
     setIsSpinning(true);
@@ -63,6 +74,8 @@ export function AppStateContainer({ className = "" }: Props) {
           <RepositoryChanges
             repositoryPath={repositoryPath}
             timestamp={lastUpdated}
+            selectedFiles={selectedFiles}
+            onSelectedFilesChange={setSelectedFiles}
           />
         </div>
         <div
@@ -71,9 +84,9 @@ export function AppStateContainer({ className = "" }: Props) {
             "flex flex-col w-full items-start gap-6"
           )}
         >
-          <fieldset className="flex-1 min-h-[250px] flex flex-col gap-6 rounded-lg border p-4 w-full items-start">
+          <fieldset className="flex-1 min-h-[200px] flex flex-col gap-6 rounded-lg border p-4 w-full items-start">
             <legend className="-ml-1 px-1 text-sm font-medium">Input</legend>
-            <div className="flex-grow flex flex-col gap-3 w-full">
+            <div className="flex-grow flex flex-col gap-3 w-full relative">
               <Label htmlFor="message" className="flex-none">
                 Prompt
               </Label>
@@ -82,11 +95,22 @@ export function AppStateContainer({ className = "" }: Props) {
                 value={prompt}
                 onChange={(e) => setPrompt(e.currentTarget.value)}
                 placeholder="Type your prompt here..."
-                className="min-h-12 resize-none flex-grow shadow-none"
-              />
-            </div>
-            <div className="flex-none text-center w-full">
-              <Button>Generate</Button>
+                maxLength={200}
+                className="min-h-12 resize-none flex-grow shadow-none pb-12"
+              ></Textarea>
+              <div className="absolute left-0 bottom-2 flex justify-between w-full px-2 items-center">
+                <span className="text-sm font-medium">
+                  {Object.keys(selectedFiles).length === 0 &&
+                    "No Files Selected"}
+                  {Object.keys(selectedFiles).length === 1 && "Selected 1 File"}
+                  {Object.keys(selectedFiles).length > 1 &&
+                    `Selected ${Object.keys(selectedFiles).length} Files`}
+                </span>
+                <Button type="submit" size="sm">
+                  Send Prompt
+                  <CornerDownLeft className="size-3.5" />
+                </Button>
+              </div>
             </div>
           </fieldset>
           <fieldset className="flex-1 min-h-[250px] flex flex-col gap-6 rounded-lg border p-4 w-full items-start">
