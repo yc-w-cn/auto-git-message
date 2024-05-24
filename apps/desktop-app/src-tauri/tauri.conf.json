@@ -34,6 +34,13 @@
             "cmd": "git",
             "args": ["diff", { "validator": "\\S+" }],
             "sidecar": false
+          },
+
+          {
+            "name": "run-git-show-command",
+            "cmd": "git",
+            "args": ["show", { "validator": "\\S+" }],
+            "sidecar": false
           }
         ]
       }

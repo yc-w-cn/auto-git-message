@@ -9,20 +9,20 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { readTextFile } from "@tauri-apps/api/fs";
-import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { Command } from "@tauri-apps/api/shell";
 import { useEffect, useMemo, useState } from "react";
 import path from "path-browserify";
-import SyntaxHighlighter from "react-syntax-highlighter";
 import { invoke } from "@tauri-apps/api/tauri";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { arduinoLight } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 interface Props {
   fileName: string;
   repositoryPath: string | undefined;
-  mode?: "added";
+  mode?: "added" | "modified" | "deleted";
 }
 
-export function GitFileViewer({ repositoryPath, fileName, mode }: Props) {
+export function FileContentChanges({ repositoryPath, fileName, mode }: Props) {
   const [fileChanges, setFileChanges] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -67,6 +67,24 @@ export function GitFileViewer({ repositoryPath, fileName, mode }: Props) {
     }
   }
 
+  async function showDeletedFile(fileFullPath: string): Promise<string> {
+    try {
+      const command = new Command("run-git-show-command", [
+        "show",
+        "HEAD:" + fileFullPath,
+      ]);
+      const output = await command.execute();
+
+      if (output.code === 0) {
+        return output.stdout;
+      } else {
+        return `Error: ${output.stderr}`;
+      }
+    } catch (error) {
+      return `Error: ${error}`;
+    }
+  }
+
   useEffect(() => {
     if (!repositoryPath || !fileName) return;
     const fileFullPath = path.join(repositoryPath, fileName);
@@ -76,7 +94,11 @@ export function GitFileViewer({ repositoryPath, fileName, mode }: Props) {
   useEffect(() => {
     if (!open || !repositoryPath || !fileName) return;
     const fileFullPath = path.join(repositoryPath, fileName);
-    if (fileFullPath && mode === "added") {
+    if (!fileFullPath) {
+      setFileChanges("");
+      return;
+    }
+    if (mode === "added") {
       setLoading(true);
       getFileContent(fileFullPath)
         .then((content) => {
@@ -86,7 +108,17 @@ export function GitFileViewer({ repositoryPath, fileName, mode }: Props) {
           console.error("Failed to read file content:", error);
         })
         .finally(() => setLoading(false));
-    } else if (fileFullPath) {
+    } else if (mode === "deleted") {
+      setLoading(true);
+      showDeletedFile(fileFullPath)
+        .then((content) => {
+          setFileChanges(content);
+        })
+        .catch((error) => {
+          console.error("Failed to read file content:", error);
+        })
+        .finally(() => setLoading(false));
+    } else {
       setLoading(true);
       checkFileChanges(fileFullPath)
         .then((text) => {
@@ -96,14 +128,18 @@ export function GitFileViewer({ repositoryPath, fileName, mode }: Props) {
           console.error("Failed to check file changes:", error);
         })
         .finally(() => setLoading(false));
-    } else {
-      setFileChanges("");
     }
   }, [repositoryPath, fileName, open]);
 
   const prefix = useMemo(() => {
     if (mode === "added") {
       return "[+]";
+    }
+    if (mode === "modified") {
+      return "[M]";
+    }
+    if (mode === "deleted") {
+      return "[-]";
     }
     return "";
   }, [mode]);
@@ -112,24 +148,34 @@ export function GitFileViewer({ repositoryPath, fileName, mode }: Props) {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger>
+      <SheetTrigger className="text-left truncate">
         {prefix}
         {fileName}
       </SheetTrigger>
-      <SheetContent>
-        <ScrollArea className="h-screen">
-          <SheetHeader>
-            <SheetTitle>File Content Changes</SheetTitle>
-            <SheetDescription>{loading && "Loading..."}</SheetDescription>
-          </SheetHeader>
-          {fileChanges ? (
-            <SyntaxHighlighter className="p-4 pb-0 text-sm rounded-lg bg-white">
-              {fileChanges}
-            </SyntaxHighlighter>
-          ) : (
-            ""
-          )}
-        </ScrollArea>
+      <SheetContent className="sm:max-w-full w-2/3 flex flex-col">
+        <SheetHeader>
+          <SheetTitle>File Content Changes</SheetTitle>
+          <SheetDescription>
+            {loading ? "Loading..." : path.join(repositoryPath || "", fileName)}
+          </SheetDescription>
+        </SheetHeader>
+        {!loading && (
+          <SyntaxHighlighter
+            style={arduinoLight}
+            language={mode === "modified" ? "diff" : undefined}
+            showLineNumbers={true}
+            className="flex-grow"
+            codeTagProps={{
+              style: {
+                height: "100%",
+                overflow: "auto",
+              },
+            }}
+            customStyle={{ padding: 0, width: "100%", overflowX: "auto" }}
+          >
+            {fileChanges.replaceAll("\n\n", "\n")}
+          </SyntaxHighlighter>
+        )}
       </SheetContent>
     </Sheet>
   );

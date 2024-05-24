@@ -9,16 +9,19 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "./ui/scroll-area";
-import SyntaxHighlighter from "react-syntax-highlighter";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { Button } from "./ui/button";
+import { useMemo } from "react";
 
 interface Props {
   content?: string | undefined;
 }
 
 export function GitStatusContentSheet({ content }: Props) {
-  console.log('content', content)
+  const txt2html = (text: string | undefined = "") => {
+    return text.replaceAll("\n\n", "\n").replaceAll("\n", "<br />");
+  };
+  const __html = useMemo(() => txt2html(content), [content]);
   return (
     <Sheet>
       <SheetTrigger disabled={!content} asChild>
@@ -37,13 +40,12 @@ export function GitStatusContentSheet({ content }: Props) {
             <SheetTitle>Git Status</SheetTitle>
             <SheetDescription></SheetDescription>
           </SheetHeader>
-          {content ? (
-            <SyntaxHighlighter className="p-4 pb-0 text-sm rounded-lg bg-white">
-              {content}
-            </SyntaxHighlighter>
-          ) : (
-            ""
-          )}
+          <section
+            className="text-sm"
+            dangerouslySetInnerHTML={{
+              __html,
+            }}
+          />
         </ScrollArea>
       </SheetContent>
     </Sheet>

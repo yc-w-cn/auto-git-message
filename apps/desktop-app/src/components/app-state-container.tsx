@@ -9,38 +9,69 @@ import { Input } from "@/components/ui/input";
 import { RepositorySetting } from "@/components/repository-setting";
 import { RepositoryChanges } from "@/components/repository-changes";
 import useForceUpdate from "@/hooks/use-force-update.hook";
+import { cn } from "@/lib/utils";
 
-export function AppStateContainer() {
+interface Props {
+  className?: string;
+}
+
+export function AppStateContainer({ className = "" }: Props) {
   const [repositoryPath, setRepositoryPath] = useState<string>("");
   const { lastUpdated, forceUpdate } = useForceUpdate();
   const [prompt, setPrompt] = useState(
     "According to the given changes, suggest git message for me."
   );
+  const [isSpinning, setIsSpinning] = useState(false);
+
+  const handleRefreshClick = () => {
+    setIsSpinning(true);
+    forceUpdate();
+
+    setTimeout(() => {
+      setIsSpinning(false);
+    }, 1000);
+  };
 
   return (
-    <div className="flex flex-col h-screen">
-      <header className="sticky md:static flex-none flex h-[57px] items-center gap-1 border-b bg-background px-4">
+    <div className={cn("flex flex-col h-screen md:overflow-hidden", className)}>
+      <header className="fixed top-0 w-full md:static flex-none flex h-[57px] items-center gap-1 border-b bg-background px-4">
         <h1 className="text-xl font-semibold">AutoGitMessage</h1>
         <Button
           variant="outline"
           size="sm"
           className="hidden sm:flex ml-auto gap-1.5 text-sm"
+          onClick={handleRefreshClick}
         >
-          <RefreshCcwIcon className="size-3.5" />
+          <RefreshCcwIcon
+            className={cn("size-3.5", isSpinning ? "animate-spin" : "")}
+          />
           Refresh
         </Button>
       </header>
 
-      <main className="static grid gap-4 md:overflow-hidden p-4 md:grid-cols-2 flex-grow flex-shrink overflow-hidden">
-        <div className="relative flex-col items-start gap-4 md:flex">
+      <main
+        className={cn(
+          "mt-[57px] md:mt-0 flex flex-col md:flex-row md:flex-grow md:overflow-hidden ",
+          "static gap-4 p-4"
+        )}
+      >
+        <div className={cn("flex-1", "flex flex-col items-start gap-4")}>
           <RepositorySetting
             repositoryPath={repositoryPath}
             onRepositoryPathChange={setRepositoryPath}
           />
-          <RepositoryChanges repositoryPath={repositoryPath} />
+          <RepositoryChanges
+            repositoryPath={repositoryPath}
+            timestamp={lastUpdated}
+          />
         </div>
-        <section className="flex-none flex flex-col w-full items-start gap-6">
-          <fieldset className="flex-1 flex flex-col gap-6 rounded-lg border p-4 w-full items-start">
+        <div
+          className={cn(
+            "flex-1 min-w-[250px]",
+            "flex flex-col w-full items-start gap-6"
+          )}
+        >
+          <fieldset className="flex-1 min-h-[250px] flex flex-col gap-6 rounded-lg border p-4 w-full items-start">
             <legend className="-ml-1 px-1 text-sm font-medium">Input</legend>
             <div className="flex-grow flex flex-col gap-3 w-full">
               <Label htmlFor="message" className="flex-none">
@@ -58,7 +89,7 @@ export function AppStateContainer() {
               <Button>Generate</Button>
             </div>
           </fieldset>
-          <fieldset className="flex-1 flex flex-col gap-6 rounded-lg border p-4 w-full items-start">
+          <fieldset className="flex-1 min-h-[250px] flex flex-col gap-6 rounded-lg border p-4 w-full items-start">
             <legend className="-ml-1 px-1 text-sm font-medium">Output</legend>
             <div className="flex-none flex flex-col gap-3 w-full">
               <Label htmlFor="summary">Summary (Required)</Label>
@@ -77,7 +108,7 @@ export function AppStateContainer() {
               />
             </div>
           </fieldset>
-        </section>
+        </div>
       </main>
     </div>
   );
