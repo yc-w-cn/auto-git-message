@@ -8,12 +8,14 @@ mod utils {
 mod commands {
     pub mod browser;
     pub mod directory;
+    pub mod request;
 }
 
 use std::env;
 use utils::environment::AppEnvironment;
 use commands::browser::open_browser;
 use commands::directory::is_directory;
+use commands::request::proxy_request;
 
 fn main() {
     // Loads the dotenv file
@@ -51,7 +53,7 @@ fn main() {
 
     // Run tauri
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![open_browser, is_directory])
+        .invoke_handler(tauri::generate_handler![open_browser, is_directory, proxy_request])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
