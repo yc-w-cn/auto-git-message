@@ -8,13 +8,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { readTextFile } from "@tauri-apps/api/fs";
-import { Command } from "@tauri-apps/api/shell";
 import { useEffect, useMemo, useState } from "react";
 import path from "path-browserify";
-import { invoke } from "@tauri-apps/api/tauri";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { arduinoLight } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { checkIsDirectory } from "@/lib/commands/check-is-directory";
+import { checkFileChanges } from "@/lib/commands/check-file-changes";
+import { getFileContent } from "@/lib/commands/get-file-content";
+import { showDeletedFile } from "@/lib/commands/show-deleted-file";
 
 interface Props {
   fileName: string;
@@ -28,67 +29,10 @@ export function FileContentChanges({ repositoryPath, fileName, mode }: Props) {
   const [loading, setLoading] = useState(false);
   const [isDir, setIsDir] = useState<boolean | null>(null);
 
-  const checkIsDirectory = async (fileFullPath: string) => {
-    try {
-      const result = await invoke<boolean>("is_directory", {
-        path: fileFullPath,
-      });
-      setIsDir(result);
-    } catch (error) {
-      console.error("Error checking directory:", error);
-    }
-  };
-
-  async function getFileContent(fullFilePath: string): Promise<string> {
-    try {
-      const content = await readTextFile(fullFilePath);
-      return content;
-    } catch (error) {
-      console.error("Error reading file:", error);
-      throw error;
-    }
-  }
-
-  async function checkFileChanges(fileFullPath: string): Promise<string> {
-    try {
-      const command = new Command("run-git-diff-command", [
-        "diff",
-        fileFullPath,
-      ]);
-      const output = await command.execute();
-
-      if (output.code === 0) {
-        return output.stdout;
-      } else {
-        return `Error: ${output.stderr}`;
-      }
-    } catch (error) {
-      return `Error: ${error}`;
-    }
-  }
-
-  async function showDeletedFile(fileFullPath: string): Promise<string> {
-    try {
-      const command = new Command("run-git-show-command", [
-        "show",
-        "HEAD:" + fileFullPath,
-      ]);
-      const output = await command.execute();
-
-      if (output.code === 0) {
-        return output.stdout;
-      } else {
-        return `Error: ${output.stderr}`;
-      }
-    } catch (error) {
-      return `Error: ${error}`;
-    }
-  }
-
   useEffect(() => {
     if (!repositoryPath || !fileName) return;
     const fileFullPath = path.join(repositoryPath, fileName);
-    checkIsDirectory(fileFullPath);
+    checkIsDirectory(fileFullPath).then((res) => res && setIsDir(res));
   }, [repositoryPath, fileName]);
 
   useEffect(() => {
