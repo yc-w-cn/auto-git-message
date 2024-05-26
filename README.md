@@ -10,6 +10,12 @@ AutoGitMessage is a TypeScript-based full-stack application designed to streamli
 - **TypeScript Full-Stack**: Built using TypeScript for both the front-end and back-end.
 - **Easy Integration**: Can be integrated into your existing Git workflow seamlessly.
 
+## Screenshots
+
+### Screenshot
+
+![Screenshot: First Screen](screenshots/screenshot-fisrt-screen.jpg)
+
 
 ## License
 
