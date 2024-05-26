@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 /**
  * Custom hook to provide a mechanism for forcing component updates.
  * @returns {{
+ *   forceUpdated: number,
  *   forceUpdated: number,
  *   forceUpdate: () => void
  * }}
@@ -28,7 +29,7 @@ export default function useForceUpdate() {
    */
   const forceUpdate = () => {
     setCounter((prevCounter) => prevCounter + 1);
-    setLastUpdated(new Date().getTime());
+    setLastUpdated(Date.now());
   };
 
   return {
