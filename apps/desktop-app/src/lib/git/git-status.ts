@@ -52,42 +52,43 @@ export async function parseGitStatus(
   let section = "";
 
   for (const line of lines) {
-    if (line.startsWith("位于分支")) {
-      branch = line.replace("位于分支", "").trim();
-    } else if (line.includes("您的分支与上游分支")) {
+    // 支持中文和英文的分支和上游分支信息
+    if (line.startsWith("位于分支") || line.startsWith("On branch")) {
+      branch = line.replace("位于分支", "").replace("On branch", "").trim();
+    } else if (line.includes("您的分支与上游分支") || line.includes("Your branch is up to date with")) {
       const match = line.match(/'(.+)'/);
       upstream = match ? match[1] : "";
-    } else if (line.includes("要提交的变更：")) {
+    } else if (line.includes("要提交的变更：") || line.includes("Changes to be committed:")) {
       section = "changesToBeCommitted";
-    } else if (line.includes("尚未暂存以备提交的变更：")) {
+    } else if (line.includes("尚未暂存以备提交的变更：") || line.includes("Changes not staged for commit:")) {
       section = "changesNotStagedForCommit";
-    } else if (line.includes("未跟踪的文件:")) {
+    } else if (line.includes("未跟踪的文件:") || line.includes("Untracked files:")) {
       section = "untrackedFiles";
-    } else if (line.includes("修改尚未加入提交")) {
+    } else if (line.includes("修改尚未加入提交") || line.includes("no changes added to commit")) {
       section = "";
-    } else if (line.startsWith("修改：")) {
-      const fileName = line.replace("修改：", "").trim();
+    } else if (line.startsWith("修改：") || line.startsWith("modified:")) {
+      const fileName = line.replace("修改：", "").replace("modified:", "").trim();
       if (await checkIsDirectory(path.join(repositoryPath, fileName))) continue;
       if (section === "changesNotStagedForCommit") {
         changesNotStagedForCommit.modified.push(fileName);
       } else if (section === "changesToBeCommitted") {
         changesToBeCommitted.modified.push(fileName);
       }
-    } else if (line.startsWith("删除：")) {
-      const fileName = line.replace("删除：", "").trim();
+    } else if (line.startsWith("删除：") || line.startsWith("deleted:")) {
+      const fileName = line.replace("删除：", "").replace("deleted:", "").trim();
       if (await checkIsDirectory(path.join(repositoryPath, fileName))) continue;
       if (section === "changesNotStagedForCommit") {
         changesNotStagedForCommit.deleted.push(fileName);
       } else if (section === "changesToBeCommitted") {
         changesToBeCommitted.deleted.push(fileName);
       }
-    } else if (line.startsWith("新文件：")) {
-      const fileName = line.replace("新文件：", "").trim();
+    } else if (line.startsWith("新文件：") || line.startsWith("new file:")) {
+      const fileName = line.replace("新文件：", "").replace("new file:", "").trim();
       if (await checkIsDirectory(path.join(repositoryPath, fileName))) continue;
       if (section === "changesToBeCommitted") {
         changesToBeCommitted.added.push(fileName);
       }
-    } else if (section === "untrackedFiles" && line && !line.startsWith("（")) {
+    } else if (section === "untrackedFiles" && line && !line.startsWith("（") && !line.startsWith("(")) {
       if (await checkIsDirectory(path.join(repositoryPath, line))) continue;
       untrackedFiles.push(line);
     }
