@@ -78,8 +78,8 @@ export function GitStatusViewer({
                 Added Files
               </p>
               <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
-                {data.changesToBeCommitted.added.map((item, idx) => (
-                  <li key={idx} className="flex items-center space-x-1">
+                {data.changesToBeCommitted.added.map((item) => (
+                  <li key={item} className="flex items-center space-x-1">
                     <Checkbox
                       onCheckedChange={(checked: boolean | "indeterminate") =>
                         handleCheckedChange(checked, item, "added")
@@ -92,8 +92,8 @@ export function GitStatusViewer({
                     />
                   </li>
                 ))}
-                {data.untrackedFiles.map((item, idx) => (
-                  <li key={idx} className="flex items-center space-x-1">
+                {data.untrackedFiles.map((item) => (
+                  <li key={item} className="flex items-center space-x-1">
                     <Checkbox
                       onCheckedChange={(checked: boolean | "indeterminate") =>
                         handleCheckedChange(checked, item, "added")
@@ -116,8 +116,8 @@ export function GitStatusViewer({
                 Modified Files
               </p>
               <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
-                {data.changesToBeCommitted.modified.map((item, idx) => (
-                  <li key={idx} className="flex items-center space-x-1">
+                {data.changesToBeCommitted.modified.map((item) => (
+                  <li key={item} className="flex items-center space-x-1">
                     <Checkbox
                       onCheckedChange={(checked: boolean | "indeterminate") =>
                         handleCheckedChange(checked, item, "modified")
@@ -130,8 +130,8 @@ export function GitStatusViewer({
                     />
                   </li>
                 ))}
-                {data.changesNotStagedForCommit.modified.map((item, idx) => (
-                  <li key={idx} className="flex items-center space-x-1">
+                {data.changesNotStagedForCommit.modified.map((item) => (
+                  <li key={item} className="flex items-center space-x-1">
                     <Checkbox
                       onCheckedChange={(checked: boolean | "indeterminate") =>
                         handleCheckedChange(checked, item, "modified")
@@ -154,8 +154,8 @@ export function GitStatusViewer({
                 Deleted Files
               </p>
               <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
-                {data.changesToBeCommitted.deleted.map((item, idx) => (
-                  <li key={idx} className="flex items-center space-x-1">
+                {data.changesToBeCommitted.deleted.map((item) => (
+                  <li key={item} className="flex items-center space-x-1">
                     <Checkbox
                       onCheckedChange={(checked: boolean | "indeterminate") =>
                         handleCheckedChange(checked, item, "deleted")
@@ -168,8 +168,8 @@ export function GitStatusViewer({
                     />
                   </li>
                 ))}
-                {data.changesNotStagedForCommit.deleted.map((item, idx) => (
-                  <li key={idx} className="flex items-center space-x-1">
+                {data.changesNotStagedForCommit.deleted.map((item) => (
+                  <li key={item} className="flex items-center space-x-1">
                     <Checkbox
                       onCheckedChange={(checked: boolean | "indeterminate") =>
                         handleCheckedChange(checked, item, "deleted")
