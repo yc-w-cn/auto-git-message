@@ -1,0 +1,17 @@
+# Changelog
+
+## [v0.0.1] - 2024-05-26
+
+### Added
+- Initial release providing core functionalities for internal testing.
+
+### Fixed
+- Resolved minor UI issues found during development to improve user experience.
+
+### Known Issues
+- Some features are not yet implemented and will be added in future versions.
+- Error messages are not detailed enough and need improvement.
+
+---
+
+This version is intended for internal testing to validate the feasibility and stability of core features. Please provide feedback if any issues or suggestions arise.
