@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Command } from "@tauri-apps/api/shell";
-import { parseGitStatus } from "@/lib/git/git-status";
+import { useEffect, useState } from "react";
+import { extractFileList, GitStatus, parseGitStatus } from "@/lib/git/git-status";
 import { GitStatusViewer } from "./git-status-viewer";
+import { checkGitStatus } from "@/lib/commands/check-git-status";
+import { GitFileStatus } from "@/lib/git/git-file-status";
 
 interface Props {
   repositoryPath: string | undefined;
   timestamp: number;
-  selectedFiles: Record<string, string>;
-  onSelectedFilesChange: (_: Record<string, string>) => void;
+  selectedFiles: Record<string, GitFileStatus>;
+  onSelectedFilesChange: (_: Record<string, GitFileStatus>) => void;
 }
 
 export function RepositoryChanges({
@@ -19,25 +20,20 @@ export function RepositoryChanges({
   onSelectedFilesChange,
 }: Props) {
   const [statusText, setStatusText] = useState<string>("");
-
-  async function checkGitStatus(directory: string): Promise<string> {
-    try {
-      const command = new Command("run-git-status-command", [
-        "-C",
-        directory,
-        "status",
-      ]);
-      const output = await command.execute();
-
-      if (output.code === 0) {
-        return output.stdout;
-      } else {
-        return `Error: ${output.stderr}`;
-      }
-    } catch (error) {
-      return `Error: ${error}`;
-    }
-  }
+  const [gitStatus, setGitStatus] = useState<GitStatus>({
+    branch: "",
+    upstream: "",
+    changesToBeCommitted: {
+      modified: [],
+      deleted: [],
+      added: [],
+    },
+    changesNotStagedForCommit: {
+      modified: [],
+      deleted: [],
+    },
+    untrackedFiles: [],
+  });
 
   useEffect(() => {
     if (repositoryPath) {
@@ -49,7 +45,16 @@ export function RepositoryChanges({
     }
   }, [repositoryPath, timestamp]);
 
-  const gitStatus = useMemo(() => parseGitStatus(statusText), [statusText]);
+  useEffect(() => {
+    parseGitStatus(statusText, repositoryPath).then((res) => {
+      setGitStatus(res)
+      const fileList = extractFileList(res)
+      const filteredSelectedFiles = Object.fromEntries(
+        Object.entries(selectedFiles).filter(([key]) => fileList.includes(key))
+      );
+      onSelectedFilesChange(filteredSelectedFiles)
+    });
+  }, [statusText, repositoryPath]);
 
   return (
     <div className="flex-grow flex-shrink overflow-hidden flex w-full items-start gap-6">

@@ -1,0 +1,15 @@
+export const models: Record<string, string> = {
+  "ERNIE-Bot": "completions",
+  "ERNIE-Bot-turbo": "eb-instant",
+  "ERNIE-Bot-4": "completions_pro",
+  "ERNIE-Speed-8K": "ernie_speed",
+  "ERNIE-Speed-128K": "ernie-speed-128k",
+  "ERNIE-4.0-8K": "completions_pro",
+  "ERNIE-4.0-8K-Preview": "ernie-4.0-8k-preview",
+  "ERNIE-3.5-8K": "completions",
+  "ERNIE-3.5-8K-Preview": "ernie-3.5-8k-preview",
+  "ERNIE-Lite-8K": "eb-instant",
+  "ERNIE-Tiny-8K": "ernie-tiny-8k",
+  "ERNIE-Character-8K": "ernie-char-8k",
+  "ERNIE Speed-AppBuilder": "ai_apaas",
+};

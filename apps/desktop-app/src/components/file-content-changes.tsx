@@ -12,28 +12,19 @@ import { useEffect, useMemo, useState } from "react";
 import path from "path-browserify";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { arduinoLight } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { checkIsDirectory } from "@/lib/commands/check-is-directory";
-import { checkFileChanges } from "@/lib/commands/check-file-changes";
-import { getFileContent } from "@/lib/commands/get-file-content";
-import { showDeletedFile } from "@/lib/commands/show-deleted-file";
+import { loadGitFileContent } from "@/lib/git/git-file-content-loader";
+import { GitFileStatus } from "@/lib/git/git-file-status";
 
 interface Props {
   fileName: string;
   repositoryPath: string | undefined;
-  mode?: "added" | "modified" | "deleted";
+  mode?: GitFileStatus;
 }
 
 export function FileContentChanges({ repositoryPath, fileName, mode }: Props) {
   const [fileChanges, setFileChanges] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isDir, setIsDir] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    if (!repositoryPath || !fileName) return;
-    const fileFullPath = path.join(repositoryPath, fileName);
-    checkIsDirectory(fileFullPath).then((res) => res && setIsDir(res));
-  }, [repositoryPath, fileName]);
 
   useEffect(() => {
     if (!open || !repositoryPath || !fileName) return;
@@ -42,37 +33,15 @@ export function FileContentChanges({ repositoryPath, fileName, mode }: Props) {
       setFileChanges("");
       return;
     }
-    if (mode === "added") {
-      setLoading(true);
-      getFileContent(fileFullPath)
-        .then((content) => {
-          setFileChanges(content);
-        })
-        .catch((error) => {
-          console.error("Failed to read file content:", error);
-        })
-        .finally(() => setLoading(false));
-    } else if (mode === "deleted") {
-      setLoading(true);
-      showDeletedFile(fileFullPath)
-        .then((content) => {
-          setFileChanges(content);
-        })
-        .catch((error) => {
-          console.error("Failed to read file content:", error);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(true);
-      checkFileChanges(fileFullPath)
-        .then((text) => {
-          setFileChanges(text);
-        })
-        .catch((error) => {
-          console.error("Failed to check file changes:", error);
-        })
-        .finally(() => setLoading(false));
-    }
+    setLoading(true);
+    loadGitFileContent(mode, fileFullPath)
+      .then((content) => {
+        setFileChanges(content);
+      })
+      .catch((error) => {
+        console.error("Failed to read file content:", error);
+      })
+      .finally(() => setLoading(false));
   }, [repositoryPath, fileName, open]);
 
   const prefix = useMemo(() => {
@@ -87,8 +56,6 @@ export function FileContentChanges({ repositoryPath, fileName, mode }: Props) {
     }
     return "";
   }, [mode]);
-
-  if ([null, true].includes(isDir)) return <></>;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>

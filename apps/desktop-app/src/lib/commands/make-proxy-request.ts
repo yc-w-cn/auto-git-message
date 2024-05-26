@@ -1,15 +1,18 @@
 import { invoke } from "@tauri-apps/api/tauri";
 
-export interface RequestOptions {
+export interface RequestOptions<TBody = any> {
   url: string;
   method: "GET" | "POST";
   headers?: Record<string, any>;
-  body?: any;
+  body?: TBody;
   proxy?: string;
+  query?: Record<string, any>;
 }
 
-export async function makeProxyRequest<T = any>(options: RequestOptions) {
-  const { url, method } = options;
+export async function makeProxyRequest<TResponse = any, TRequest = any>(
+  options: RequestOptions<TRequest>
+) {
+  const { method, query } = options;
   const headers = {
     "Content-Type": "application/json",
     ...options.headers,
@@ -18,16 +21,31 @@ export async function makeProxyRequest<T = any>(options: RequestOptions) {
   if (method === "POST") {
     body = JSON.stringify(options.body);
   }
+  // 构建查询字符串
+  const url =
+    options.url +
+    (query
+      ? (options.url.includes("?") ? "&" : "?") +
+        new URLSearchParams(query).toString()
+      : "");
   try {
-    const response = await invoke<T>("proxy_request", {
+    console.log('makeProxyRequest', {
+      method,
+      url,
+      headers,
+      body: body || null,
+      proxyUrl: options.proxy || null,
+    })
+    const response = await invoke<string>("proxy_request", {
       method,
       url,
       headers,
       body: body || null,
       proxyUrl: options.proxy || null,
     });
-    console.log("Response:", response);
-    return response
+    const json = JSON.parse(response) as TResponse
+    console.log("Response:", json);
+    return json;
   } catch (error) {
     console.error("Error:", error);
   }

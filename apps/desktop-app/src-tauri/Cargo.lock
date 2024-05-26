@@ -69,8 +69,6 @@ dependencies = [
  "dotenvy",
  "reqwest",
  "sentry",
- "serde",
- "serde_json",
  "tauri",
  "tauri-build",
 ]

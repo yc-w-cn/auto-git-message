@@ -16,30 +16,18 @@ import { Label } from "@/components/ui/label";
 import { useLocalStorage, useBoolean } from "usehooks-ts";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-
-interface ChatModelSettings {
-  provider: string;
-  model: string;
-  apiKey: string;
-  secretKey: string;
-}
-
-const DEFAULT_SETTING = {
-  provider: process.env.NEXT_PUBLIC_LLM_PROVIDER || "ChatBaiduWenxin",
-  model: process.env.NEXT_PUBLIC_LLM_MODEL || "ERNIE-Speed-128K",
-  apiKey: process.env.NEXT_PUBLIC_LLM_API_KEY || "YOUR_BAIDU_API_KEY",
-  secretKey: process.env.NEXT_PUBLIC_LLM_SECRET_KEY || "YOUR_BAIDU_SECRET_KEY",
-} satisfies ChatModelSettings;
+import { ChatModelSettings } from "@/lib/settings/types";
+import { DEFAULT_KEY, DEFAULT_SETTING } from "@/lib/settings/constants";
 
 export function SettingButton() {
   const { toast } = useToast();
   const [setting, saveSetting] = useLocalStorage<ChatModelSettings>(
-    "AUTO_GIT_MESSAGE__CHAT_MODEL_SETTINGS",
+    DEFAULT_KEY,
     DEFAULT_SETTING
   );
   const [currentSetting, setCurrentSetting] =
     useState<ChatModelSettings>(setting);
-  const { value, setValue, setTrue, setFalse, toggle } = useBoolean();
+  const { value, setValue, setFalse } = useBoolean();
   return (
     <Dialog open={value} onOpenChange={setValue}>
       <DialogTrigger asChild>

@@ -11,13 +11,14 @@ import { GitStatusContentSheet } from "./git-status-content-sheet";
 import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import { GitFileStatus } from "@/lib/git/git-file-status";
 
 interface Props {
   repositoryPath: string | undefined;
   rawData: string;
   data: GitStatus;
-  selectedFiles: Record<string, string>;
-  onSelectedFilesChange: (_: Record<string, string>) => void;
+  selectedFiles: Record<string, GitFileStatus>;
+  onSelectedFilesChange: (_: Record<string, GitFileStatus>) => void;
 }
 
 export function GitStatusViewer({
@@ -27,7 +28,7 @@ export function GitStatusViewer({
   selectedFiles,
   onSelectedFilesChange,
 }: Props) {
-  const addSelectedFiles = (newItem: string, newItemMode: string) => {
+  const addSelectedFiles = (newItem: string, newItemMode: GitFileStatus) => {
     if (!(newItem in selectedFiles)) {
       onSelectedFilesChange({ ...selectedFiles, [newItem]: newItemMode });
     }
@@ -39,7 +40,7 @@ export function GitStatusViewer({
         acc[key] = selectedFiles[key];
       }
       return acc;
-    }, {} as Record<string, string>);
+    }, {} as Record<string, GitFileStatus>);
 
     onSelectedFilesChange(newSelectedFiles);
   };
@@ -47,7 +48,7 @@ export function GitStatusViewer({
   const handleCheckedChange = (
     checked: boolean | "indeterminate",
     item: string,
-    mode: string
+    mode: GitFileStatus
   ) => (checked ? addSelectedFiles(item, mode) : removeSelectedFiles(item));
 
   return (
