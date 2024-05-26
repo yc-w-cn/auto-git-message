@@ -60,7 +60,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "cn.wangyuchen.auto_git_message",
+      "identifier": "cn.wangyuchen.auto-git-message",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
