@@ -11,11 +11,11 @@ mod commands {
     pub mod request;
 }
 
-use std::env;
-use utils::environment::AppEnvironment;
 use commands::browser::open_browser;
 use commands::directory::is_directory;
 use commands::request::proxy_request;
+use std::env;
+use utils::environment::AppEnvironment;
 
 fn main() {
     // Loads the dotenv file
@@ -23,7 +23,7 @@ fn main() {
 
     // Loads the environment variable. It doesn't matter how how it was set.
     let app_env = dotenvy::var("APP_ENV")
-        .expect("APP_ENV not found")
+        .unwrap_or_else(|_| "production".to_string())
         .parse()
         .expect("Failed to parse APP_ENV");
 
@@ -37,23 +37,29 @@ fn main() {
     }
 
     // Loads Sentry DSN from environment file.
-    let sentry_dsn: String = dotenvy::var("SENTRY_DSN")
-        .expect("SENTRY_DSN not found")
-        .parse()
-        .expect("Failed to parse SENTRY_DSN");
+    let sentry_dsn = env::var("SENTRY_DSN").ok();
 
-    // Initialize Sentry
-    let _guard = sentry::init((
-        sentry_dsn,
-        sentry::ClientOptions {
-            release: sentry::release_name!(),
-            ..Default::default()
-        },
-    ));
+    if let Some(dsn) = sentry_dsn {
+        // If SENTRY_DSN is found, initialize Sentry
+        let _guard = sentry::init((
+            dsn,
+            sentry::ClientOptions {
+                release: sentry::release_name!(),
+                ..Default::default()
+            },
+        ));
+        println!("Sentry initialized.");
+    } else {
+        println!("SENTRY_DSN not found. Sentry not initialized.");
+    }
 
     // Run tauri
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![open_browser, is_directory, proxy_request])
+        .invoke_handler(tauri::generate_handler![
+            open_browser,
+            is_directory,
+            proxy_request
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
