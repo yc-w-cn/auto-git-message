@@ -2,7 +2,7 @@
   "name": "@auto-git-message/desktop-app",
   "version": "0.0.1",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3122",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
