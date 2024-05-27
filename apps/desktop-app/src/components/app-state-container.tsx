@@ -147,7 +147,11 @@ export function AppStateContainer({ className = "" }: Props) {
                         selectedFiles
                       );
                       setSuggestion(answer);
-                    } catch (e) {
+                    } catch (e: any) {
+                      toast({
+                        variant: "destructive",
+                        description: e.message || " 发生错误",
+                      });
                       console.error("Error: ", e);
                     } finally {
                       setGenerating(false);
