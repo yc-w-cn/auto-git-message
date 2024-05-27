@@ -1,10 +1,15 @@
 import { Command } from "@tauri-apps/api/shell";
 
-export async function showDeletedFile(fileFullPath: string): Promise<string> {
+export async function showDeletedFile(
+  repositoryPath: string,
+  filePath: string
+): Promise<string> {
   try {
     const command = new Command("run-git-show-command", [
+      "-C",
+      repositoryPath,
       "show",
-      "HEAD:" + fileFullPath,
+      "HEAD:" + filePath,
     ]);
     const output = await command.execute();
 

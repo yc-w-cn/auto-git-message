@@ -32,14 +32,24 @@
           {
             "name": "run-git-diff-command",
             "cmd": "git",
-            "args": ["diff", { "validator": "\\S+" }],
+            "args": [
+              "-C",
+              { "validator": "\\S+" },
+              "diff",
+              { "validator": "\\S+" }
+            ],
             "sidecar": false
           },
 
           {
             "name": "run-git-show-command",
             "cmd": "git",
-            "args": ["show", { "validator": "\\S+" }],
+            "args": [
+              "-C",
+              { "validator": "\\S+" },
+              "show",
+              { "validator": "\\S+" }
+            ],
             "sidecar": false
           }
         ]

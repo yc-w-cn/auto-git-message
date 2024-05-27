@@ -1,10 +1,15 @@
 import { Command } from "@tauri-apps/api/shell";
 
-export async function checkFileChanges(fileFullPath: string): Promise<string> {
+export async function checkFileChanges(
+  repositoryPath: string,
+  filePath: string
+): Promise<string> {
   try {
     const command = new Command("run-git-diff-command", [
+      "-C",
+      repositoryPath,
       "diff",
-      fileFullPath,
+      filePath,
     ]);
     const output = await command.execute();
 

@@ -28,13 +28,8 @@ export function FileContentChanges({ repositoryPath, fileName, mode }: Props) {
 
   useEffect(() => {
     if (!open || !repositoryPath || !fileName) return;
-    const fileFullPath = path.join(repositoryPath, fileName);
-    if (!fileFullPath) {
-      setFileChanges("");
-      return;
-    }
     setLoading(true);
-    loadGitFileContent(mode, fileFullPath)
+    loadGitFileContent(mode, repositoryPath, fileName)
       .then((content) => {
         setFileChanges(content);
       })
