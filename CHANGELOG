@@ -8,6 +8,10 @@
 - Fixed: Confusion caused by an incorrect key for checkboxes during refresh.
 - Fixed: Specifying git context to avoid errors caused by leaving the context.
 
+---
+
+This version is intended for internal testing to validate the feasibility and stability of core features. Please provide feedback if any issues or suggestions arise.
+
 ## [v0.0.1] - 2024-05-26
 
 ### Added
