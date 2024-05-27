@@ -7,12 +7,13 @@ mod utils {
 
 mod commands {
     pub mod browser;
-    pub mod directory;
+    pub mod filesystem;
     pub mod request;
 }
 
 use commands::browser::open_browser;
-use commands::directory::is_directory;
+use commands::filesystem::is_directory;
+use commands::filesystem::is_file;
 use commands::request::proxy_request;
 use std::env;
 use utils::environment::AppEnvironment;
@@ -58,6 +59,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             open_browser,
             is_directory,
+            is_file,
             proxy_request
         ])
         .run(tauri::generate_context!())

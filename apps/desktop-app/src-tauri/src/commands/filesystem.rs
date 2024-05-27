@@ -7,3 +7,10 @@ pub fn is_directory(path: String) -> bool {
         Err(_) => false,
     }
 }
+
+#[tauri::command]
+pub fn is_file(path: String) -> bool {
+  fs::metadata(path)
+    .map(|metadata| metadata.is_file())
+    .unwrap_or(false)
+}
