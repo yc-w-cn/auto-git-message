@@ -1,6 +1,6 @@
 [package]
 name = "app"
-version = "0.0.1"
+version = "0.0.2"
 description = "AutoGitMessage is a TypeScript-based full-stack application designed to streamline the process of generating commit messages. It reads code changes in a Git project, generates diffs, and utilizes AI to automatically write meaningful and contextually appropriate Git commit messages."
 authors = ["Yuchen Wang <contact@wangyuchen.cn>"]
 license = ""

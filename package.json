@@ -1,6 +1,6 @@
 {
   "name": "@yc-w-cn/auto-git-message",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A TypeScript-based full-stack application to automate the generation of meaningful and contextually appropriate Git commit messages.",
   "scripts": {},
   "repository": {
